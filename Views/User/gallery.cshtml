@@ -1,0 +1,76 @@
+﻿@model List<CinemaXXII.Models.GALLERY>
+@{
+    Layout = "~/Views/Shared/userlayout.cshtml";
+}
+    <script src="~/Scripts/login.js"></script>
+    @Styles.Render("~/Content/gallery.css")
+            <div class="modal-header" style="background: #dfb636;margin-bottom: 20px;">
+                    <h3 class="modal-title" style="text-align: center; color:white"><strong> GALLERY</strong></h3>
+            </div>
+            @{
+                var images = from i in Model where i.STATUS.Equals("Active") select i;
+
+                int slideNo = 1;
+                for(int i=0;i<images.Count();)
+                {
+                    <div class="row" style="margin-left: 15px;margin-bottom:15px">
+                    @{
+                        for (int j = 0; j < 4 && i < images.Count(); j++)
+                        {
+                            <div class="column">
+                                <img src="@images.ElementAt(i).IMAGE" style="width:100%" onclick="openModal();currentSlide(@slideNo)" class="hover-shadow cursor">
+                            </div>
+                            slideNo++;
+                            i++;
+                        }
+                    }
+                    </div>
+                }
+            }
+
+            <div id="myModal" class="modal">
+                <span class="close cursor" onclick="closeModal()">&times;</span>
+                <div class="modal-content">
+
+                    @{
+                        slideNo--;
+                        int counter = 1;
+                        foreach (var gallery in images)
+                        {
+                            <div class="mySlides">
+                                <div class="numbertext">@counter / @slideNo</div>
+                                <img src="@gallery.IMAGE" style="width:100%">
+                            </div>
+                            counter++;
+                        }
+                    }
+
+                    <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+                    <a class="next" onclick="plusSlides(1)">&#10095;</a>
+
+                    <div class="caption-container">
+                        <p id="caption"></p>
+                    </div>
+
+                    @{
+                        counter = 1;
+                        for (int i = 0; i < images.Count();)
+                        {
+                            <div class="row" style="margin-left: 15px;margin-bottom:15px">
+                                @{
+                                    for (int j = 0; j < 4 && i < images.Count(); j++)
+                                    {
+                                        <div class="column">
+                                            <img class="demo cursor" src="@images.ElementAt(i).IMAGE" style="width:100%" onclick="currentSlide(@counter)" alt="@images.ElementAt(i).NAME">
+                                        </div>
+                                        counter++;
+                                        i++;
+                                    }
+                                }
+                            </div>
+                        }
+                            
+                    }
+                </div>
+            </div>
+    @Scripts.Render("~/Scripts/gallery.js")

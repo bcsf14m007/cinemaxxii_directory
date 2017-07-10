@@ -1,0 +1,166 @@
+﻿@model List<CinemaXXII.Models.BOOKING>
+
+@{
+    Layout = "~/Views/Shared/adminlayout.cshtml";
+}
+@Styles.Render("~/Content/forms.css")
+
+<form enctype="multipart/form-data" enctype="multipart/form-data" enctype="multipart/form-data" class="formoid-default-orange" style="background-color:#FFFFFF;font-size:17px;font-family:'Open Sans','Helvetica Neue','Helvetica',Arial,Verdana,sans-serif;color:#666666;max-width:600px;min-width:150px;background:#F5F5DC;margin-top:50px;" method="post" action="/Admin/GetBookings" onsubmit="return validateFields()">
+    <div class="title">
+        <h2 style="text-align:center;margin-top:20px;"><b>Booking Details</b></h2>
+    </div>
+    <div class="element-input">
+        <label class="title">Booking Id </label>
+        <input class="large" type="text" name="bookingid" id="bookingid" onkeypress='return event.charCode >= 48 && event.charCode <= 57' value=""/>
+    </div>
+    <div class="element-input">
+        <label class="title">OR</label>
+    </div>
+    <div class="element-input">
+        <label class="title">Show Id </label>
+        <input class="large" type="text" name="showid" id="showid" onkeypress='return event.charCode >= 48 && event.charCode <= 57' value=""/>
+    </div>
+    <div class="submit"><input type="submit" value="Submit" /></div>
+</form>
+@{
+    if (Model == null)
+    {
+        <style>
+            .footer {
+                position: fixed;
+                width: 100%;
+                bottom: 0;
+            }
+        </style>
+    }
+}
+
+<script>
+    function validateFields()
+    {
+        var bookingId = document.getElementById('bookingid').value;
+        var showId = document.getElementById('showid').value;
+        if(bookingId !='' && showId!= '')
+        {
+            alert('Search Either by Show Id or Booking Id');
+            return false;
+        }
+        else if(bookingId !='' && showId== '')
+        {
+            document.getElementById("showid").setAttribute('value', "-1");
+            return true;
+        }
+        else if (bookingId == '' && showId != '') {
+            document.getElementById("bookingid").setAttribute('value', "-1");
+            return true;
+        }
+        else
+        {
+            alert('Please Enter search value');
+            return false;
+        }
+    }
+</script>
+@{
+    if (Model != null)
+    {
+        <div style="max-width: 900px; margin: auto; border: 2px solid #2b2b2b; border-radius: 15px">
+            <div class="modal-header" style="background: #dfb636;border-top-left-radius: 15px;border-top-right-radius: 15px">
+                <h3 class="modal-title" style="text-align: center; color:white"><strong>Bookings</strong></h3>
+            </div>
+            <div class="container-fluid">
+                @{
+
+                    if (Model.Count == 0)
+                    {
+                        <h1 style="text-align:center">Sorry No Bookings Available</h1>
+                    }
+                    else
+                    {
+                        <div class="input-group">
+                            <span class="input-group-addon">Filter</span>
+                            <input id="filter" type="text" class="form-control" placeholder="Type here...">
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Booking Id</th>
+                                        <th>User Id</th>
+                                        <th>Show Id</th>
+                                        <th>Booking Date</th>
+                                        <th>Tickets Purchased</th>
+                                        <th>Seats</th>
+                                        <th>Total Amount</th>
+                                        <th>&#9986;</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="searchable">
+                                    @{
+                                        for (int i = 0; i < Model.Count; i++)
+                                        {
+                                            <tr>
+                                                <td>@(i + 1)</td>
+                                                <td>@Model.ElementAt(i).BOOKING_ID</td>
+                                                <td>@Model.ElementAt(i).USER_ID</td>
+                                                <td>@Model.ElementAt(i).SHOW_ID</td>
+                                                <td>@Model.ElementAt(i).BOOKING_DATE.ToString("dd-MM-yyyy")</td>
+                                                <td>@Model.ElementAt(i).TICKETS_PURCHASED</td>
+                                                <td>
+                                                    @{
+                                                        int counter = 1;
+                                                        char seat = 'A';
+                                                        string space = "  ";
+                                                        for (int j = 0; j < Model.ElementAt(i).SEATS.Length; j++)
+                                                        {
+                                                            if (Model.ElementAt(i).SEATS[j] == 'y')
+                                                            {
+                                                                @counter @seat @space
+                                                            }
+                                                            counter++;
+                                                            if (counter == 11)
+                                                            {
+                                                                counter = 1;
+                                                                seat++;
+                                                            }
+                                                        }
+                                                    }
+                                                </td>
+                                                <td>@Model.ElementAt(i).TOTAL_AMOUNT</td>
+                                                <td><a style="font-size:20px" href="/Admin/DeleteBooking/@Model.ElementAt(i).BOOKING_ID">&#10006;</a></td>
+                                            </tr>
+                                        }
+                                    }
+
+                                </tbody>
+                            </table>
+                        </div>
+                                        }
+                }
+            </div>
+
+            <div class="modal-footer" style="background:#dfb636;border-bottom-left-radius: 15px;border-bottom-right-radius: 15px;margin-top:-1px;height:50px">
+            </div>
+        </div>
+        <script>
+            $(document).ready(function () {
+
+                (function ($) {
+
+                    $('#filter').keyup(function () {
+
+                        var rex = new RegExp($(this).val(), 'i');
+                        $('.searchable tr').hide();
+                        $('.searchable tr').filter(function () {
+                            return rex.test($(this).text());
+                        }).show();
+
+                    })
+
+                }(jQuery));
+
+            });
+        </script>
+                                        }
+}

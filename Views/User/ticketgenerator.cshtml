@@ -1,0 +1,70 @@
+﻿@model CinemaXXII.Models.BOOKING
+@{
+    Layout = "~/Views/Shared/userlayout.cshtml";
+}
+    
+<script src="~/Scripts/login.js"></script>
+                <hr style="border-top: 2px solid black; margin-top:20px;" />
+
+            <div style="max-width: 800px; margin: auto; border: 2px solid #2b2b2b; border-radius: 15px">
+                <div class="modal-header" style="background: #dfb636;border-top-left-radius: 15px;border-top-right-radius: 15px">
+                    <h3 class="modal-title" style="text-align: center; color:white"><strong>Receipt</strong></h3>
+                </div>
+                @{ 
+                    CinemaXXII.Models.CinemaXXIIDbEntities db = new CinemaXXII.Models.CinemaXXIIDbEntities();
+                    CinemaXXII.Models.SHOWING currentShow=null;
+                    CinemaXXII.Models.MOVIE movie=null;
+                    try
+                    {
+                        currentShow = db.SHOWINGs.Find(Model.SHOW_ID);
+                        movie = db.MOVIEs.Find(currentShow.MOVIE_ID);
+                    }
+                    catch(Exception e) { }
+                }
+                <div class="container-fluid">
+                   <div class="row">          
+                       <img src="@movie.POSTER_IMAGE" alt="@movie.NAME" class="col-md-5" style="height:440px;width:295px;" />
+                       <div class="row col-md-7" style="font-size: 16px">
+                           <p><b>Director</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp;&nbsp; @movie.DIRECTOR</p>
+                           <p><b>Actors</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp;&nbsp; @movie.ACTORS</p>
+                           <p><b>Rating</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp;&nbsp; @movie.RATING/10</p>
+                           <p><b>Genre</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp; @movie.GENRE</p>
+                           <p><b>Release</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp;&nbsp; @movie.RELEASE_DATE.ToString("MMMM dd, yyyy") </p>
+                           <p><b>Ticket Price </b> &nbsp;: &nbsp;&nbsp; @movie.TICKET_PRICE</p>
+                           <p><b>Synopsis </b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp;&nbsp; @movie.DESCRIPTION</p>
+                           <hr style="border: 1px solid #2b2b2b" />
+                           <h4 style="text-align:center;margin-bottom:10px;"><b>Booking Details</b></h4>
+                           <p><b>Booking Id </b> &nbsp;&nbsp; @Model.BOOKING_ID</p>
+                           <p><b>@currentShow.DATE.ToString("MMMM dd, ddd")</b> <span style="display:block;width:70px;background:#dfb636;color:white;border-radius:5px;text-align:center;float:right;margin-right:220px">@currentShow.SHOWTIME</span> </p>
+                           <p>
+                               <b>Seats</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp;&nbsp; 
+                                @{ 
+                                    int counter = 1;
+                                    char seat = 'A';
+                                    string space = "  ";
+                                    for(int i=0;i<Model.SEATS.Length;i++)
+                                    {
+                                        if(Model.SEATS[i]=='y')
+                                        {
+                                                @counter @seat @space
+                                        }
+                                        counter++;
+                                        if (counter == 11)
+                                        {
+                                            counter = 1;
+                                            seat++;
+                                        }
+                                    }
+                                }
+                           </p>
+                           <hr style="border: 1px solid #2b2b2b" />
+                           <p><b>Total Amount </b>: @Model.TOTAL_AMOUNT </p>
+                       </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer" style="background:#dfb636;border-bottom-left-radius: 15px;border-bottom-right-radius: 15px;margin-top:-1px;">
+                    <button type="button" class="btn btn-info" onclick="location.href = '/User/Index'">Back To Home</button>
+                </div>
+            </div>
+                <hr style="border-bottom: 2px solid black" />

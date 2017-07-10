@@ -1,0 +1,158 @@
+﻿@model List<CinemaXXII.Models.MOVIE>
+@{
+    Layout = "~/Views/Shared/adminlayout.cshtml";
+    List<string> status = new List<string> { "Now Showing", "Upcoming", "Not Showing" };
+    CinemaXXII.Models.CinemaXXIIDbEntities db = new CinemaXXII.Models.CinemaXXIIDbEntities();
+}
+@Styles.Render("~/Content/forms.css")
+
+@{
+    if (ViewBag.DeleteStatus != null)
+    {
+        <div class="modal fade" id="confirmDialog" role="dialog">
+            <div class="modal-dialog">
+                <!-- Modal content-->
+                <div class="modal-content" style="min-width: 800px;margin-left:-50px">
+                    <div class="modal-header" style="background: #dfb636">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h3 class="modal-title" style="text-align: center; color:white"><strong>Movie Delete Success Dialog</strong></h3>
+                    </div>
+                    <div class="modal-body" style="background: #2d2d2d ; margin-bottom: -15px">
+                        <div class="container-fluid" style="background: #2d2d2d;color:white">
+                            <h3>@ViewBag.DeleteStatus</h3>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="background:#dfb636">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            $('#confirmDialog').modal('show');
+        </script>
+        ViewBag.DeleteStatus = null;
+    }
+}
+<form enctype="multipart/form-data" enctype="multipart/form-data" enctype="multipart/form-data" class="formoid-default-orange" style="background-color:#FFFFFF;font-size:17px;font-family:'Open Sans','Helvetica Neue','Helvetica',Arial,Verdana,sans-serif;color:#666666;max-width:600px;min-width:150px;background:#F5F5DC;margin-top:50px;" method="post" action="/Admin/GetMovies">
+    <div class="title">
+        <h2 style="text-align:center;margin-top:20px;"><b>Select Movie</b></h2>
+    </div>
+    <div class="element-select" title=" ">
+        <label class="title">STATUS<span class="required">*</span></label>
+        <div class="large">
+            <span>
+                <select name="statusid" id="statusid" required>
+                    <option value="">None</option>
+                    @{ 
+                        for(int i=0;i<status.Count;i++)
+                        {
+                            <option value="@i">@status.ElementAt(i)</option>
+                        }
+                    }
+                </select>
+            </span>
+        </div>
+    </div>
+    <div class="submit"><input type="submit" value="Submit" /></div>
+</form>
+@{
+    if (Model == null)
+    {
+        <style>
+            .footer {
+                position: fixed;
+                width: 100%;
+                bottom: 0;
+            }
+        </style>
+    }
+}
+
+@{
+    if (Model != null)
+    {
+        <div style="max-width: 900px; margin: auto; border: 2px solid #2b2b2b; border-radius: 15px">
+            <div class="modal-header" style="background: #dfb636;border-top-left-radius: 15px;border-top-right-radius: 15px">
+                <h3 class="modal-title" style="text-align: center; color:white"><strong>Movies</strong></h3>
+            </div>
+            <div class="container-fluid">
+                @{ 
+
+                if(Model.Count==0)
+                {
+                    <h1 style="text-align:center">Sorry No Movies under Selected Category</h1>
+                    }
+                    else
+                    {
+                        <div class="input-group">
+                            <span class="input-group-addon">Filter</span>
+                            <input id="filter" type="text" class="form-control" placeholder="Type here...">
+                        </div>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Movie Name</th>
+                                    <th>Director</th>
+                                    <th>Actors</th>
+                                    <th>Genre</th>
+                                    <th>Release Date</th>
+                                    <th>Rating</th>
+                                    <th>Status</th>
+                                    <th>Ticket Price</th>
+                                    <th>&#9986;</th>
+                                </tr>
+                            </thead>
+                            <tbody class="searchable">
+                                @{
+                                    for (int i = 0; i < Model.Count; i++)
+                                    {
+                                        <tr>
+                                            <td>@(i + 1)</td>
+                                            <td>@Model.ElementAt(i).NAME</td>
+                                            <td>@Model.ElementAt(i).DIRECTOR</td>
+                                            <td>@Model.ElementAt(i).ACTORS</td>
+                                            <td>@Model.ElementAt(i).GENRE</td>
+                                            <td>@Model.ElementAt(i).RELEASE_DATE.ToString("dd-MM-yyyy")</td>
+                                            <td>@Model.ElementAt(i).RATING</td>
+                                            <td>@Model.ElementAt(i).STATUS</td>
+                                            <td>@Model.ElementAt(i).TICKET_PRICE</td>
+                                            <td><a style="font-size:20px" href="/Admin/DeleteMovie/@Model.ElementAt(i).MOVIE_ID">&#10006;</a></td>
+                                        </tr>
+                                    }
+                                }
+
+                            </tbody>
+                        </table>
+                    </div>
+                                    }
+                }
+            </div>
+
+            <div class="modal-footer" style="background:#dfb636;border-bottom-left-radius: 15px;border-bottom-right-radius: 15px;margin-top:-1px;height:50px">
+            </div>
+        </div>
+        <script>
+            $(document).ready(function () {
+
+                (function ($) {
+
+                    $('#filter').keyup(function () {
+
+                        var rex = new RegExp($(this).val(), 'i');
+                        $('.searchable tr').hide();
+                        $('.searchable tr').filter(function () {
+                            return rex.test($(this).text());
+                        }).show();
+
+                    })
+
+                }(jQuery));
+
+            });
+        </script>
+
+                                    }
+}

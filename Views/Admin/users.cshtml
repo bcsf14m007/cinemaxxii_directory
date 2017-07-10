@@ -1,0 +1,150 @@
+﻿@model CinemaXXII.Models.USER
+
+@{
+    Layout = "~/Views/Shared/adminlayout.cshtml";
+}
+
+
+<div style="margin-left:20%;margin-right:20%;margin-top:25px;margin-bottom:25px">
+    <div class="input-group">
+        <span class="input-group-addon">Filter</span>
+        <input id="filter" type="text" class="form-control" placeholder="Type here...">
+    </div>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Contact</th>
+                    <th>Role</th>
+                    <th>&#9986;</th>
+                </tr>
+            </thead>
+            <tbody class="searchable">
+                @{
+                    CinemaXXII.Models.CinemaXXIIDbEntities db = new CinemaXXII.Models.CinemaXXIIDbEntities();
+                    var users = from user in db.USERS select user;
+                    for (int i = 0; i < users.ToList().Count; i++)
+                    {
+                        <tr>
+                            <td>@(i + 1)</td>
+                            <td>@users.ToList().ElementAt(i).USERNAME</td>
+                            <td>@users.ToList().ElementAt(i).EMAIL</td>
+                            <td>@users.ToList().ElementAt(i).NUMBER</td>
+                            <td>@users.ToList().ElementAt(i).ROLE</td>
+                            <td> <a style="font-size:20px" href="/Admin/EditUser/@users.ToList().ElementAt(i).USER_ID">&#9874;</a> <a style="font-size:20px" href="/Admin/DeleteUser/@users.ToList().ElementAt(i).USER_ID">&#10006;</a></td>
+                        </tr>
+                    }
+                }
+
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+@{
+    if (Model != null)
+    {
+        <div class="modal fade" id="editUser" role="dialog">
+            <div class="modal-dialog">
+                <!-- Modal content-->
+                <div class="modal-content" style="min-width: 800px;margin-left:-50px">
+                    <div class="modal-header" style="background: #dfb636">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h3 class="modal-title" style="text-align: center; color:white"><strong>Edit News</strong></h3>
+                    </div>
+                    <div class="modal-body" style="background: #2d2d2d ; margin-bottom: -15px">
+                        <div class="container-fluid" style="background: #2d2d2d;color:white">
+                            @using (Html.BeginForm("UserEdit","Admin"))
+                            {
+                                @Html.AntiForgeryToken()
+
+                                <div class="form-horizontal">
+                                    <h2>USER</h2>
+                                    <hr />
+                                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                                    @Html.HiddenFor(model => model.USER_ID)
+
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.USERNAME, htmlAttributes: new { @class = "control-label col-md-2" })
+                                        <div class="col-md-10">
+                                            @Html.EditorFor(model => model.USERNAME, new { htmlAttributes = new { @class = "form-control" } })
+                                            @Html.ValidationMessageFor(model => model.USERNAME, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.NUMBER, htmlAttributes: new { @class = "control-label col-md-2" })
+                                        <div class="col-md-10">
+                                            @Html.EditorFor(model => model.NUMBER, new { htmlAttributes = new { @class = "form-control" } })
+                                            @Html.ValidationMessageFor(model => model.NUMBER, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.EMAIL, htmlAttributes: new { @class = "control-label col-md-2" })
+                                        <div class="col-md-10">
+                                            @Html.EditorFor(model => model.EMAIL, new { htmlAttributes = new { @class = "form-control" } })
+                                            @Html.ValidationMessageFor(model => model.EMAIL, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.PASSWORD, htmlAttributes: new { @class = "control-label col-md-2" })
+                                        <div class="col-md-10">
+                                            @Html.EditorFor(model => model.PASSWORD, new { htmlAttributes = new { @class = "form-control" } })
+                                            @Html.ValidationMessageFor(model => model.PASSWORD, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.ROLE, htmlAttributes: new { @class = "control-label col-md-2" })
+                                        <div class="col-md-10">
+                                            @Html.EditorFor(model => model.ROLE, new { htmlAttributes = new { @class = "form-control" } })
+                                            @Html.ValidationMessageFor(model => model.ROLE, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="col-md-offset-2 col-md-10">
+                                            <input type="submit" value="Save" class="btn btn-default" />
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="background:#dfb636">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <script>
+            $('#editUser').modal('show');
+        </script>
+    }
+}
+<script>
+    $(document).ready(function () {
+
+        (function ($) {
+
+            $('#filter').keyup(function () {
+
+                var rex = new RegExp($(this).val(), 'i');
+                $('.searchable tr').hide();
+                $('.searchable tr').filter(function () {
+                    return rex.test($(this).text());
+                }).show();
+
+            })
+
+        }(jQuery));
+
+    });
+</script>

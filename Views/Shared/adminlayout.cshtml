@@ -1,0 +1,60 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <title>@ViewBag.Title</title>
+
+    <link rel="icon" href="~/Images/baricon.png">
+    <link href="~/Content/login.css" rel="stylesheet">
+    <link href="~/Content/bootstrap.css" rel='stylesheet' type='text/css' />
+    <!-- Custom Theme files -->
+        
+    <link href="~/Content/admin.css" rel="stylesheet" type="text/css" media="all" />
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+    <script src="~/Scripts/jquery.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+
+</head>
+<body style="background:#F5F5DC">
+    <!-- header-section-starts -->
+    <div class="full">        
+            <div class="top-header">
+                <div class="logo">
+                    <a href="/User/Index"><img src="~/Images/logo.png" alt="" /></a>
+                    <p>Movie Theater</p>
+                </div>
+                <div class="search" style="width:300px">
+                    <p style="float:left">@Session["Username"]</p>
+                    <a href="/User/Logout" style="color:white;width: 79px;text-align: center;background: #2b2b2b;border-radius: 50em;padding: .6em 1em;border: 1px solid rgba(255, 255, 255, 0.6);font-size:12px;float:right;margin-top:-7px">LOG OUT</a>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+
+            <div id="mainHead">
+                <ul>
+                    <li class="@(ViewBag.Title == "Add Movie" ? "active" : "")">@Html.ActionLink("Add Movie", "Addmovie", "Admin")</li>
+                    <li class="@(ViewBag.Title == "Edit Movie" ? "active" : "")">@Html.ActionLink("Edit Movie", "Editmovie", "Admin")</li>
+                    <li class="@(ViewBag.Title == "Show Movies" ? "active" : "")">@Html.ActionLink("Show Movies", "Showmovie", "Admin")</li>
+                    <li class="@(ViewBag.Title == "Edit Gallery" ? "active" : "")">@Html.ActionLink("Edit Gallery", "Editgallery", "Admin")</li>
+                    <li class="@(ViewBag.Title == "Add News" ? "active" : "")">@Html.ActionLink("Add News", "Addnews", "Admin")</li>
+                    <li class="@(ViewBag.Title == "Edit News" ? "active" : "")">@Html.ActionLink("Edit News", "Editnews", "Admin")</li>
+                    <li class="@(ViewBag.Title == "Users" ? "active" : "")">@Html.ActionLink("Users", "Users", "Admin")</li>
+                    <li class="@(ViewBag.Title == "Bookings" ? "active" : "")">@Html.ActionLink("Bookings", "Bookings", "Admin")</li>
+                    <li class="@(ViewBag.Title == "Manage Show Times" ? "active" : "")">@Html.ActionLink("Manage Show Times", "Manageshowtimes", "Admin")</li>
+                    <li class="@(ViewBag.Title == "Show Times" ? "active" : "")">@Html.ActionLink("Show Times", "Showtime", "Admin")</li>
+                </ul>
+            </div>            
+
+            @RenderBody()
+            
+            <div class="footer" style="text-align: center;border-top:2px dotted #dfb636">
+                <a style="color:#2b2b2b" href="#">muhammadmohsinakhlaq@gmail.com</a>
+                <div class="copyright">
+                    <p>Muhammad Mohsin Akhlaq &#169;</p>
+                </div>
+            </div>
+    </div>
+    <div class="clearfix"></div>
+</body>
+
+</html>

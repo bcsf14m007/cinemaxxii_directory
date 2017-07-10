@@ -1,0 +1,62 @@
+﻿@model List<CinemaXXII.Models.GALLERY>
+@{
+    Layout = "~/Views/Shared/adminlayout.cshtml";
+}
+@Scripts.Render("~/Scripts/editgallery.js")
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header" style="text-align:center">Gallery</h1>
+        @{
+            foreach (var galleryItem in Model)
+            {
+                <div class="col-lg-3 col-md-4 col-xs-6 thumb">
+                    <a class="thumbnail" href="#" data-image-id="" data-toggle="modal" data-title="@galleryItem.NAME" data-caption='@Html.ActionLink("Delete Image","DeleteImage",new { id=galleryItem.GID})' data-image="@galleryItem.IMAGE" data-target="#image-gallery">
+                        <img class="img-responsive" src="@galleryItem.IMAGE" alt="@galleryItem.NAME">
+                    </a>
+                </div>
+            }
+        }
+        <div class="col-lg-3 col-md-4 col-xs-6 thumb">
+            <div class="thumbnail" style="background:#2b2b2b;padding:13px 12px 12px 12px;color:white">
+                <form method="post" enctype="multipart/form-data" action="/Admin/AddImageToGallery" style="">
+                    <div class="form-group">
+                        <label for="name">Name:</label>
+                        <input type="text" name="name" class="form-control" id="name" required/>
+                    </div>
+                    <div class="form-group">
+                        <label for="image">Image:</label>
+                        <input type="file" name="image" class="form-control" id="image" required/>
+                    </div>
+                    <div class="form-group" style="text-align:center;margin-top:20px;margin-bottom:10px">
+                        <button type="submit"  class="btn btn-default">Add Image</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="image-gallery" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title" id="image-gallery-title"></h4>
+                </div>
+                <div class="modal-body">
+                    <img id="image-gallery-image" class="img-responsive" src="">
+                </div>
+                <div class="modal-footer">
+                    <div class="col-md-2">
+                        <button type="button" class="btn btn-primary" id="show-previous-image">Previous</button>
+                    </div>
+                    <div class="col-md-8 text-justify" id="image-gallery-caption" style="text-align:center">                        
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" id="show-next-image" class="btn btn-primary">Next</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,66 @@
+﻿@{
+    Layout = "~/Views/Shared/adminlayout.cshtml";
+    CinemaXXII.Models.CinemaXXIIDbEntities db = new CinemaXXII.Models.CinemaXXIIDbEntities();
+}
+<div style="max-width:400px;margin:auto;margin-top:25px;margin-bottom:25px">
+    <form action="/Admin/AddShow" method="post">
+        <div class="form-group">
+            <label for="date">Date</label>
+            <input type="date" name="date" class="form-control" id="date" onchange="getTimings();" min="@DateTime.Now.ToString("yyyy-MM-dd")" max="@DateTime.Now.AddDays(7).ToString("yyyy-MM-dd")" required/>
+        </div>
+        <div class="form-group">
+            <label for="timing">Timing</label>
+            <select id="timing" name="timing" class="form-control"required>
+                <option value="">None</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="movieid">Movie</label>
+            <select id="movieid" name="movieid" class="form-control"required>
+                <option value="">None</option>
+                @{
+                    var movies = from movie in db.MOVIEs where movie.STATUS.Equals("Now Showing") == true select movie;
+                    foreach (var movie in movies)
+                    {
+                        <option value="@movie.MOVIE_ID">@movie.NAME</option>
+                    }
+                }
+            </select>
+        </div>
+        <button type="submit" class="btn btn-default">Submit</button>
+    </form>
+</div>
+<style>
+    .footer {
+        position: fixed;
+        width: 100%;
+        bottom: 0;
+    }
+</style>
+<script>
+    function getTimings()
+    {
+        document.getElementById("timing").innerHTML = "<option value=''>None</option>";
+        var date = document.getElementById('date').value;        
+        if (date == '')
+            alert('Please Select a Date first');
+        else
+        {
+            var url = "/Admin/GetShowTimings";
+            JSONstring = JSON.stringify(date); 
+            $.getJSON(url, { cdate: JSONstring }, function (data) {
+                if (data == '')
+                    alert('Sorry No Slots Avaiable');
+                else {
+                    var output = $("#timing");
+                    for (var i = 0; i < data.length ; i++)
+                    {
+                        var timing = data[i];
+                        output.append("<option value='" + timing.showtime + "'>" + timing.showtime + "</option>");
+                    }
+                }
+            });
+        }
+
+    }
+</script>

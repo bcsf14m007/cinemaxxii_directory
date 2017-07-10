@@ -1,0 +1,56 @@
+﻿@{
+    Layout = "~/Views/Shared/userlayout.cshtml";
+}
+<script src="~/Scripts/login.js"></script>
+
+@{
+    if (ViewBag.EmailResponse != null)
+    {
+        <div id="myModal" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" onclick="location.href ='/User/Index'">&times;</button>
+                        <h4 class="modal-title">Response</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>@ViewBag.EmailResponse</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal" onclick="location.href ='/User/Index'">Close</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+            ViewBag.EmailResponse = null;
+        }
+        <script>$("#myModal").modal()</script>
+    }
+            <div class="main-contact">
+                <h3 class="head">CONTACT</h3>
+                <p>WE'RE ALWAYS HERE TO HELP YOU</p>
+            
+                <div class="contact-form">
+                    <form action="/User/SendMail" method="post">
+                        <div class="col-md-6 contact-left">
+                            <input type="text" name="name" placeholder="Name" required />
+                            <input type="text" name="email" placeholder="E-mail" required />
+                            <input type="text" name="phone" placeholder="Phone" required />
+                        </div>
+                        <div class="col-md-6 contact-right">
+                            <textarea placeholder="Message" name="message"></textarea>
+                            <input type="submit" value="SEND" />
+                        </div>
+                        <div class="clearfix"></div>
+                    </form>
+                </div>
+                <div class="contact_info">
+                    <h3>Find Us Here</h3>
+                    <div class="map">
+                        <iframe width="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d14472.28053515379!2d67.0682502!3d24.9296806!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0xa6faac717c13e4c9!2sCinepax+City+Auditorium!5e0!3m2!1sen!2s!4v1444653503516"></iframe><br><small><a href="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d14472.28053515379!2d67.0682502!3d24.9296806!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0xa6faac717c13e4c9!2sCinepax+City+Auditorium!5e0!3m2!1sen!2s!4v1444653503516" style="color:#000;text-align:left;font-size:12px">View Larger Map</a></small>
+                    </div>
+                </div>
+
+            </div>

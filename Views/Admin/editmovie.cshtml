@@ -1,0 +1,174 @@
+﻿@model CinemaXXII.Models.MOVIE
+@{ 
+    Layout = "~/Views/Shared/adminlayout.cshtml";
+    List<string> status = new List<string>{"Now Showing", "Upcoming", "Not Showing"};
+}
+@Styles.Render("~/Content/forms.css")
+@{
+    if (Model == null)
+    {
+        <form enctype="multipart/form-data" class="formoid-default-orange" style="background-color:#FFFFFF;font-size:17px;font-family:'Open Sans','Helvetica Neue','Helvetica',Arial,Verdana,sans-serif;color:#666666;max-width:600px;min-width:150px;background:#F5F5DC;margin-top:50px;" method="post" action="/Admin/GetToEditMovie">
+            <div class="title">
+                <h2 style="text-align:center;margin-top:20px;"><b>Select Movie</b></h2>
+            </div>
+            <div class="element-select" title=" ">
+                <label class="title">NAME<span class="required">*</span></label>
+                <div class="large">
+                    <span>
+                        @{
+                            CinemaXXII.Models.CinemaXXIIDbEntities db = new CinemaXXII.Models.CinemaXXIIDbEntities();
+                            var movies = from movie in db.MOVIEs where movie.STATUS == "Now Showing" || movie.STATUS == "Upcoming" select movie;
+
+                            <select name="movieid" required="required">
+                                @{
+                                    <option value="">None</option>
+                                    foreach (var movie in movies)
+                                    {
+                                        <option value="@movie.MOVIE_ID">@movie.NAME</option>
+                                    }
+                                }
+                            </select><i></i>
+                        }
+
+                    </span>
+                </div>
+            </div>            
+            <div class="submit"><input type="submit" value="Submit" /></div>
+        </form>
+        <style>
+            .footer {
+                position: fixed;
+                width: 100%;
+                bottom: 0;
+            }
+        </style>
+    }
+    if (ViewBag.SubmitMovie != null)
+    {
+        <div class="modal fade" id="confirmDialog" role="dialog">
+            <div class="modal-dialog">
+                <!-- Modal content-->
+                <div class="modal-content" style="min-width: 800px;margin-left:-50px">
+                    <div class="modal-header" style="background: #dfb636">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h3 class="modal-title" style="text-align: center; color:white"><strong>Update Success Dialog</strong></h3>
+                    </div>
+                    <div class="modal-body" style="background: #2d2d2d ; margin-bottom: -15px">
+                        <div class="container-fluid" style="background: #2d2d2d;color:white">
+                            <h3>@ViewBag.SubmitMovie</h3>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="background:#dfb636">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            $('#confirmDialog').modal('show');
+        </script>
+        ViewBag.SubmitMovie = null;
+    }
+}
+
+@{
+    if (Model != null)
+    {
+        <button class="btn btn-primary" style="color:#dfb636;margin-left:10%;margin-top:10px;margin-bottom:20px;" onclick="location.href = '/Admin/Editmovie';"> &#8592; Select Movie Again</button>
+        <form enctype="multipart/form-data" enctype="multipart/form-data" enctype="multipart/form-data" class="formoid-default-orange" style="background-color:#FFFFFF;font-size:17px;font-family:'Open Sans','Helvetica Neue','Helvetica',Arial,Verdana,sans-serif;color:#666666;max-width:600px;min-width:150px;background:#F5F5DC" method="post" action="/Admin/UpdateMovie?movieid=@Model.MOVIE_ID">
+            <div class="title">
+                <h2 style="text-align:center;margin-top:20px"><b>Edit Movie Details</b></h2>
+            </div>
+            <div class="element-input">
+                <label class="title">Name<span class="required">*</span></label>
+                <input class="large" type="text" name="name" maxlength="70" required="required" value="@Model.NAME" />
+            </div>
+            <div class="element-input">
+                <label class="title">Director<span class="required">*</span></label>
+                <input class="large" type="text" name="director" maxlength="50" required="required" value="@Model.DIRECTOR"/>
+            </div>
+            <div class="element-input">
+                <label class="title">Actors<span class="required">*</span></label>
+                <input class="large" type="text" name="actors" maxlength="100" required="required" value="@Model.ACTORS"/>
+            </div>
+            <div class="element-input">
+                <label class="title">Genre<span class="required">*</span></label>
+                <input class="large" type="text" name="genre" maxlength="50" required="required" value="@Model.GENRE"/>
+            </div>
+            <div class="element-number">
+                <label class="title">Rating<span class="required">*</span></label>
+                <input class="large" type="text" min="0" max="10" maxlength="3" name="rating" required="required" onkeypress='return event.charCode >= 48 && event.charCode <= 57 || event.charCode == 46' value="@Model.RATING" />
+            </div>
+            <div class="element-input">
+                <label class="title">Trailer<span class="required">*</span></label>
+                <input class="large" type="text" name="trailer" maxlength="50" required="required" value="@Model.TRAILER"/>
+            </div>
+            <div class="element-select" title=" ">
+                <label class="title">Status<span class="required">*</span></label>
+                <div class="large">
+                    <span>
+                        @{
+                            <select name="status" required="required">
+                                @{
+                                    for (int i = 0; i < status.Count; i++)
+                                    {
+                                        if (Model.STATUS.Equals(status.ElementAt(i)))
+                                        {
+                                            <option value="@status.ElementAt(i)" selected>@status.ElementAt(i)</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@status.ElementAt(i)">@status.ElementAt(i)</option>
+                                        }
+                                    }
+                                }
+                            </select><i></i>
+                        }
+                        
+                    </span>
+                </div>
+            </div>
+            <div class="element-number">
+                <label class="title">Ticket Price<span class="required">*</span></label>
+                <input class="large" type="text" min="0" max="1500" maxlength="4" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="ticketprice" required="required" value="@Model.TICKET_PRICE" />
+            </div>
+            <div class="element-textarea">
+                <label class="title">Description<span class="required">*</span></label>
+                <textarea class="medium" name="description" cols="20" rows="5" maxlength="300" required="required">@Model.DESCRIPTION</textarea>
+            </div>
+            <div class="element-file">
+                <label class="title">Poster</label>
+                <label class="large">
+                    <div class="button">Upload Image</div>
+                    <input type="file" class="file_input" name="posterimage" />
+                    <div class="file_text">No Image Uploaded</div>
+                </label>
+            </div>
+            <div class="element-file">
+                <label class="title">Cover</label>
+                <label class="large">
+                    <div class="button">Upload Image</div>
+                    <input type="file" class="file_input" name="coverimage"/>
+                    <div class="file_text">No Image Uploaded</div>
+                </label>
+            </div>
+            <div class="element-file">
+                <label class="title">Trailer Image</label>
+                <label class="large">
+                    <div class="button">Upload Image</div>
+                    <input type="file" class="file_input" name="trailerimage"/>
+                    <div class="file_text">No Image Uploaded</div>
+                </label>
+            </div>
+            <div class="submit"><input type="submit" value="Submit" /></div>
+        </form>
+
+
+
+        <script>
+            jQuery("input[type=file]").change(function () {
+                $(this).next().html($(this).val());
+            });
+        </script>
+    }
+}

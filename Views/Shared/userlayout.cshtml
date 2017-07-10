@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>@ViewBag.Title</title>
+    
+    <link rel="icon" href="~/Images/baricon.png">
+    <link href="~/Content/login.css" rel="stylesheet">
+    <link href="~/Content/bootstrap.css" rel='stylesheet' type='text/css' />
+    <!-- Custom Theme files -->
+    <link href="~/Content/style.css" rel="stylesheet" type="text/css" media="all" />
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+    <script src="~/Scripts/jquery.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <script>
+        function searchMovie()
+        {
+            $.ajaxSetup({
+                async: false
+            });
+            var toSearch = document.getElementById("srch-term").value;
+            if (toSearch == '')
+                alert('Please Search Some Movie First');
+            else
+            {
+                JSONstring = JSON.stringify(toSearch);
+                $.getJSON("/User/GetSearchMovie", { tosearch: JSONstring }, function (data) {
+                    if (data == '')
+                    {
+                        document.getElementById("searchBody").innerHTML = "<h2>Sorry No Search Results Found</h2>"
+                        document.getElementById("movieName1").textContent = "Nothing Found";
+                        $('#searchModal1').modal('show');
+                    }
+                    else {
+                        document.getElementById("movieName").textContent = data.NAME;
+
+                        $('#movieimage').attr('src', data.POSTER_IMAGE);
+                        $('#moviedirector').text(data.DIRECTOR);
+                        $('#movieactors').text(data.ACTORS);
+                        $('#moviegenre').text(data.GENRE);
+                        $('#moviedetails').text(data.DESCRIPTION);
+                        $('#moviestatus').text(data.STATUS);
+                        $('#movierating').text(data.RATING);
+                        $('#movieprice').text(data.TICKET_PRICE);
+                        var tempdate = data.RELEASE_DATE.toString();
+                        var tempdate2 = tempdate.substr(6);
+                        var finaldate = tempdate2.replace(')/','');
+                        var date1 = new Date(parseInt(finaldate));
+                        var dateString = date1.toDateString();
+                        $('#movierelease').text(dateString);
+
+                        $('#searchModal').modal('show');
+                    }
+                });
+                $.ajaxSetup({
+                    async: true
+                });
+                
+            }
+        }
+        $('[data-toggle="tooltip"]').tooltip();
+    </script>
+</head>
+<body>
+    <!-- header-section-starts -->
+    <div class="full">
+        <div class="menu">
+            <ul>
+                <li><a class="@(ViewBag.Title == "Home" ? "active" : "")" href="/User/Index" data-toggle="tooltip" title="Home"><i class="home"></i></a></li>
+                <li>
+                    <a class="@(ViewBag.Title == "Trailers" ? "active" : "")" href="/User/Videos" data-toggle="tooltip" title="Trailers">
+                        <div class="video"><i class="videos"></i><i class="videos1"></i></div>
+                    </a>
+                </li>
+                <li>
+                    <a class="@(ViewBag.Title == "Gallery" ? "active" : "")" href="/User/Gallery" data-toggle="tooltip" title="Gallery">
+                        <div class="cat"><i class="watching"></i><i class="watching1"></i></div>
+                    </a>
+                </li>
+                <li>
+                    <a class="@(ViewBag.Title == "Reservation" ? "active" : "")" href="/User/Booking" data-toggle="tooltip" title="Booking">
+                        <div class="bk"><i class="booking"></i><i class="booking1"></i></div>
+                    </a>
+                </li>
+                <li>
+                    <a class="@(ViewBag.Title == "Contact Us" ? "active" : "")" href="/User/Contact" data-toggle="tooltip" title="Contact Us">
+                        <div class="cnt"><i class="contact"></i><i class="contact1"></i></div>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="modal fade" id="searchModal" role="dialog">
+            <div class="modal-dialog">
+                <!-- Modal content-->
+                <div class="modal-content" style="min-width: 900px;margin-left:-50px">
+                    <div class="modal-header" style="background: #dfb636">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h3 class="modal-title" style="text-align: center; color:white"><strong id="movieName"></strong></h3>
+                    </div>
+                    <div class="modal-body" style="background: #2d2d2d ; margin-bottom: -15px">
+                        <div class="container-fluid" style="background: #2d2d2d;color:white">
+                            <div class="row">
+                                <img id="movieimage" src="" alt="" class="col-md-4" style="height:400px;width:300px;" />
+                                <div class="row col-md-8" style="font-size: 16px;color: white">
+                                    <p><b>Director</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp;&nbsp; <span id="moviedirector"></span></p>
+                                    <p><b>Actors</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp;&nbsp; <span id="movieactors"></span></p>
+                                    <p><b>Rating</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp;&nbsp; <span id="movierating"></span>/10</p>
+                                    <p><b>Genre</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp; <span id="moviegenre"></span></p>
+                                    <p><b>Release</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp;&nbsp; <span id="movierelease"></span></p>
+                                    <p><b>Ticket Price </b> &nbsp;: &nbsp;&nbsp; <span id="movieprice"></span></p>
+                                    <p><b>Status </b> &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp;&nbsp; <span id="moviestatus"></span></p>
+                                    <p><b>Synopsis </b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp;&nbsp; <span id="moviedetails"></span></p>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="background:#dfb636">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="searchModal1" role="dialog">
+            <div class="modal-dialog">
+                <!-- Modal content-->
+                <div class="modal-content" style="min-width: 900px;margin-left:-50px">
+                    <div class="modal-header" style="background: #dfb636">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h3 class="modal-title" style="text-align: center; color:white"><strong id="movieName1"></strong></h3>
+                    </div>
+                    <div class="modal-body" style="background: #2d2d2d ; margin-bottom: -15px">
+                        <div class="container-fluid" style="background: #2d2d2d;color:white">
+                            <div id="searchBody" class="row">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="background:#dfb636">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="main">
+            <div class="top-header">
+                <div class="logo">
+                    <a href="/User/Index"><img src="~/Images/logo.png" alt="" /></a>
+                    <p>Movie Theater</p>
+
+                </div>
+                        @{
+                            if (Session["UserId"] == null)
+                            {
+                                <div class="search" style="width:550px">
+                                    <nav class="main-nav" style="float:right">
+                                        <ul>
+                                            <li><a class="cd-signin" href="#0" style="font-size:12px">SIGN IN</a></li>
+                                            <li><a class="cd-signup" href="#0" style="font-size:12px">SIGN UP</a></li>
+                                        </ul>
+                                    </nav>
+                                    <div class="col-md-3 searchbar" style="float:left;width:60%;margin-top:-8px;">
+                                        <form class="navbar-form" action="javascript:searchMovie()"  role="search" method="post">
+                                            <div class="input-group add-on">
+                                                <input class="form-control" placeholder="Search" name="srch-term" id="srch-term" type="text" style="border-top:1px solid #2b2b2b; border-bottom:1px solid #2b2b2b;border-left:1px solid #2b2b2b;color:black" required/>
+                                                <div class="input-group-btn">
+                                                    <button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
+                                                </div>
+                                            </div>
+                                        </form>
+
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="search" style="width:620px">
+                                    <a href="/User/Logout" style="color:white;width: 79px;text-align: center;background: #2b2b2b;border-radius: 50em;padding: .6em 1em;border: 1px solid rgba(255, 255, 255, 0.6);font-size:12px;float:right;margin-top:0px">LOG OUT</a>
+                                    <p style="float:right;margin-top:8px;margin-right:10px">@Session["Username"]</p>
+                                    
+                                    <div class="col-md-3 searchbar" style="float:left;width:56%;margin-top:-8px">
+                                        <form class="navbar-form" action="javascript:searchMovie()" role="search" method="post">
+                                            <div class="input-group add-on">
+                                                <input class="form-control" placeholder="Search" name="srch-term" id="srch-term" type="text" style="border-top:1px solid #2b2b2b; border-bottom:1px solid #2b2b2b;border-left:1px solid #2b2b2b;color:black" required/>
+                                                <div class="input-group-btn">
+                                                    <button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            }
+                        }
+                <div class="clearfix"></div>
+            </div>
+
+            <div class="cd-user-modal">
+                <!-- this is the entire modal form, including the background -->
+                <div class="cd-user-modal-container">
+                    <!-- this is the container wrapper -->
+                    <ul class="cd-switcher">
+                        <li><a href="#0">Sign in</a></li>
+                        <li><a href="#0">New account</a></li>
+                    </ul>
+                    <script>
+                        function validateLoginEmail() {
+                            removeSigninEmailError();
+                            removeSigninPasswordError();
+                            $.ajaxSetup({
+                                async: false
+                            });
+                            var email = document.getElementById('signin-email').value;
+                            var password = document.getElementById('signin-password').value;
+                            var retval = false;
+
+                            $.getJSON("/User/CheckLogin?email=" + email + "&password="+password, function (data) {
+                                if (data == 1) {
+                                    $('#signinEmail').addClass('is-visible');
+                                    retval = false;
+                                }
+                                else if (data == 2) {
+                                    $('#signinPassword').addClass('is-visible');
+                                    retval = false
+                                }
+                                else
+                                    retval = true;
+
+                            });
+                            $.ajaxSetup({
+                                async: true
+                            });
+                            
+                            return retval;
+
+                        }
+                        function removeSigninEmailError() {
+                            $('#signinEmail').removeClass('is-visible');
+                        }
+                        function removeSigninPasswordError() {
+                            $('#signinPassword').removeClass('is-visible');
+                        }
+                    </script>
+                    <div id="cd-login">
+                        <!-- log in form -->
+                        <form class="cd-form" action="/User/Login" method="post" onsubmit="return validateLoginEmail();">
+                            <p class="fieldset">
+                                <label class="image-replace cd-email" for="signin-email">E-mail</label>
+                                <input class="full-width has-padding has-border" name="signin-email" id="signin-email" type="email" placeholder="E-mail" required onfocus="removeSigninEmailError()"/>
+                                <span class="cd-error-message" id="signinEmail">Sorry your Account dont exist</span>
+                            </p>
+
+                            <p class="fieldset">
+                                <label class="image-replace cd-password" for="signin-password">Password</label>
+                                <input class="full-width has-padding has-border" name="signin-password" id="signin-password" type="text" placeholder="Password" required onfocus="removeSigninPasswordError()"/>
+                                <a href="#0" class="hide-password">Hide</a>
+                                <span class="cd-error-message" id="signinPassword">Invalid Password</span>
+                            </p>
+
+                            <p class="fieldset">
+                                <input class="full-width" type="submit" value="Login">
+                            </p>
+                        </form>
+                        <p class="cd-form-bottom-message"><a href="#0">Forgot your password?</a></p>
+                        <!-- <a href="#0" class="cd-close-form">Close</a> -->
+                    </div>
+                    <!-- cd-login -->
+                    <script>
+                        function validateEmail() {
+                            $.ajaxSetup({
+                                async: false
+                            });
+                            var email = document.getElementById('signup-email').value;
+
+                            var retval = false;
+
+                            $.getJSON("/User/CheckEmail?email=" + email, function (data)
+                            {
+                                retval = data;
+                            });
+                            $.ajaxSetup({
+                                async: true
+                            });
+
+                            if (retval == false)
+                            {
+                                $('#emailError').addClass('is-visible');
+                            }
+                            return retval;
+                            
+                        }
+                        function removeEmailError()
+                        {
+                            $('#emailError').removeClass('is-visible');
+                        }
+                    </script>
+
+
+                    <div id="cd-signup">
+                        <!-- sign up form -->
+                        <form class="cd-form" action="/User/Signup" method="post" onsubmit="return validateEmail();">
+                            <p class="fieldset">
+                                <label class="image-replace cd-username" for="signup-username">Username</label>
+                                <input class="full-width has-padding has-border" id="signup-username" name="signup-username" type="text" placeholder="Username" required/>
+                            </p>
+
+                            <p class="fieldset">
+                                <label class="image-replace cd-contact" for="signup-contact"> Contact Number</label>
+                                <input class="full-width has-padding has-border" id="signup-contact" name="signup-contact" type="text" placeholder="Contact Number" maxlength="11" required/>
+                            </p>
+
+                            <p class="fieldset">
+                                <label class="image-replace cd-email" for="signup-email">E-mail</label>
+                                <input class="full-width has-padding has-border" id="signup-email" name="signup-email" type="email" placeholder="E-mail" required onfocus="removeEmailError();"/>
+                                <span class="cd-error-message" id="emailError">Sorry the Account Exist Already</span>
+                            </p>
+
+                            <p class="fieldset">
+                                <label class="image-replace cd-password" for="signup-password">Password</label>
+                                <input class="full-width has-padding has-border" id="signup-password" name="signup-password" type="text" placeholder="Password" required/>
+                                <a href="#0" class="hide-password">Hide</a>
+                            </p>
+
+                            <p class="fieldset">
+                                <input class="full-width has-padding" type="submit" value="Create account"/>
+                            </p>
+                        </form>
+
+                        <!-- <a href="#0" class="cd-close-form">Close</a> -->
+                    </div>
+                    
+                    <!-- cd-signup -->
+                    <div id="cd-reset-password">
+                        <!-- reset password form -->
+                        <p class="cd-form-message" style="font-size:12px">Lost your password? Please enter your email address. You will receive your password.</p>
+
+                        <form class="cd-form" action="/User/ResetPassword">
+                            <p class="fieldset">
+                                <label class="image-replace cd-email" for="reset-email">E-mail</label>
+                                <input class="full-width has-padding has-border" name="reset-email" id="reset-email" type="email" placeholder="E-mail" required/>
+                                <span class="cd-error-message">Invalid Email</span>
+                            </p>
+
+                            <p class="fieldset">
+                                <input class="full-width has-padding" type="submit" value="Reset password">
+                            </p>
+                        </form>
+
+                        <p class="cd-form-bottom-message"><a href="#0">Back to log-in</a></p>
+                    </div>
+                    
+                    <a href="#0" class="cd-close-form">Close</a>
+                </div>
+                <!-- cd-user-modal-container -->
+            </div>
+            <!-- cd-user-modal -->
+
+            
+
+            @RenderBody()
+              
+            <div class="footer" style="text-align: center; ">
+                <a href="#">muhammadmohsinakhlaq@gmail.com</a>
+                <div class="copyright">
+                    <p>Muhammad Mohsin Akhlaq &#169;</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+</body>
+
+</html>

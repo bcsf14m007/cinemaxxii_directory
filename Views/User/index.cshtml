@@ -1,0 +1,230 @@
+@model List<CinemaXXII.Models.MOVIE>
+@{
+    Layout = "~/Views/Shared/userlayout.cshtml";
+}
+<script src="~/Scripts/login.js"></script>
+<body onload="NewsScrollStart();">
+            @Styles.Render("~/Content/jquery.slidey.min.css")
+            @Styles.Render("~/Content/font-awesome.css")
+            @Styles.Render("~/Content/font-awesome.min.css")
+            @Styles.Render("~/Content/news.css")
+            
+            <div id="slidey" style="display:none;">
+                <ul>
+                    @{
+                        var nowShowing = Model.Where(m => m.STATUS.Equals("Now Showing"));
+                        foreach (var movie in nowShowing)
+                        {
+                            string modalName = "modal" + movie.MOVIE_ID;
+                            <li>
+                                <img src="@movie.COVER_IMAGE" alt="@movie.NAME">
+                                <p class='title'><button data-toggle="modal" data-target="#@modalName" style="text-decoration: none; background:none; border:0">@movie.NAME &nbsp;&nbsp;<i class="fa fa-caret-square-o-right"></i></button></p>
+                                <p class='description'> @movie.DESCRIPTION</p>
+                            </li>
+                        }
+                    }
+                </ul>
+            </div>
+
+            <!--Modal start-->
+
+            @{
+                CinemaXXII.Models.CinemaXXIIDbEntities db = new CinemaXXII.Models.CinemaXXIIDbEntities();
+                foreach (var movie in nowShowing)
+                {
+                    var showing = from movies in db.SHOWINGs where (movies.MOVIE_ID == movie.MOVIE_ID) orderby movies.DATE select new { movies.SHOW_ID, movies.DATE };
+                    List<CinemaXXII.Controllers.DateGetter> dates = new List<CinemaXXII.Controllers.DateGetter>();
+                    int lastIndex = -1;
+                    for (int i = 0; i < showing.Count(); i++)
+                    {
+                        //if (DateTime.Now.CompareTo(showing.ToList().ElementAt(i).DATE) >= 0)
+                        if (lastIndex >= 0 && showing.ToList().ElementAt(i).DATE.ToString("MMMM dd, ddd").Equals(dates.ElementAt(lastIndex).date))
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            if (showing.ToList().ElementAt(i).DATE.Subtract(DateTime.Now).Days >= 0)
+                            {
+                                CinemaXXII.Controllers.DateGetter temp = new CinemaXXII.Controllers.DateGetter { showid = showing.ToList().ElementAt(i).SHOW_ID, date = showing.ToList().ElementAt(i).DATE.ToString("MMMM dd, ddd") };
+                                dates.Add(temp);
+                                lastIndex++;
+                            }
+                        }
+                    }
+                    string modalName = "modal" + movie.MOVIE_ID;
+                    <!-- Modal -->
+                    <div class="modal fade" id="@modalName" role="dialog">
+                        <div class="modal-dialog">
+                            <!-- Modal content-->
+                            <div class="modal-content" style="min-width: 900px;margin-left:-50px">
+                                <div class="modal-header" style="background: #dfb636">
+                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                    <h3 class="modal-title" style="text-align: center; color:white"><strong>@movie.NAME</strong></h3>
+                                </div>
+                                <div class="modal-body" style="background: #2d2d2d ; margin-bottom: -15px">
+                                    <div class="container-fluid" style="background: #2d2d2d">
+                                        <div class="row">
+                                            <img src="@movie.POSTER_IMAGE" alt="@movie.NAME" class="col-md-4" style="height:400px;width:300px;" />
+                                            <div class="row col-md-8" style="font-size: 16px;color: white">
+                                                <p><b>Director</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp;&nbsp; @movie.DIRECTOR</p>
+                                                <p><b>Actors</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp;&nbsp; @movie.ACTORS</p>
+                                                <p><b>Rating</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp;&nbsp; @movie.RATING/10</p>
+                                                <p><b>Genre</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp; @movie.GENRE</p>
+                                                <p><b>Release</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp;&nbsp; @movie.RELEASE_DATE.ToString("MMMM dd, yyyy") </p>
+                                                <p><b>Ticket Price </b> &nbsp;: &nbsp;&nbsp; @movie.TICKET_PRICE</p>
+                                                <p><b>Synopsis </b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp;&nbsp; @movie.DESCRIPTION</p>
+                                                <hr style="border: 1px solid #dfb636" />
+                                                <h3 style="text-align:center;margin-bottom:10px;margin-top:4px;"><b>Timing</b></h3>
+
+                                                @{
+                                                    foreach (var show in dates)
+                                                    {
+                                                        <p style="margin-bottom:5px;">
+                                                            <b>@show.date</b>
+                                                            @{
+                                                                var date = from movies in db.SHOWINGs where movies.SHOW_ID == show.showid select movies.DATE;
+                                                                var movieId = from movies in db.SHOWINGs where movies.SHOW_ID == show.showid select movies.MOVIE_ID;
+
+                                                                foreach (var shows in db.SHOWINGs)
+                                                                {
+                                                                    if (shows.MOVIE_ID == movieId.ToList().ElementAt(0) && shows.DATE.Subtract(date.ToList().ElementAt(0)).Days == 0)
+                                                                    {
+                                                                        <span style="display:block;width:70px;background:#dfb636;color:white;border-radius:5px;text-align:center;float:right;margin-right:5px;">@shows.SHOWTIME</span>
+                                                                    }
+                                                                }
+                                                            }
+                                                            
+                                                        </p>
+                                                    }
+                                                }
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer" style="background:#dfb636">
+                                    <button type="button" class="btn btn-info" onclick="location.href = '/User/Booking';">BOOK TICKET</button>
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                                                    }
+            }
+            
+
+
+            <!--Modal end-->
+            
+
+            <div class="news">
+                <div class="col-md-6 news-left-grid">
+                    <h3>Dont be late,</h3>
+                    <h2>Book your ticket now!</h2>
+                    <h4>Easy, simple & fast.</h4>
+                    <a href="/User/Booking"><i class="book"></i>BOOK TICKET</a>
+                    <p>Get Discount up to <strong>10%</strong> if you are a Member!</p>
+                </div>
+                <h2><strong style="color:darkgray">News</strong></h2>
+                <div class="col-md-6 news-right-grid" id="newsDiv" style="overflow:auto;height: 270px;margin-top:15px">
+                    <div id="NewsDiv" class="news-scroll" onMouseover="scrollspeed=0" onMouseout="scrollspeed=current">
+                        <div class="scroll-text-if" style="font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif">
+                            @{
+                                var news = from n in db.NEWS where n.STATUS.Equals("Active") == true select n;
+                                foreach (var n in news)
+                                {
+                                    <span class="scroll-title-if" style="font-size:20px;font-weight:700;">
+                                        @n.HEADING<br>
+                                    </span>
+
+                                    <label style="font-size:18px">@n.DATE.ToString("MMMM dd, yyyy")</label><br />
+                                    <span style="font-size:16px">@n.DETAILS</span>
+
+                                    <br/><br/>
+                                }
+                            }
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="clearfix"></div>
+            </div>
+            <div class="modal-header" style="background: #dfb636;margin-top:15px;margin-bottom:0px;">
+                    <h3 class="modal-title" style="text-align: center; color:white"><strong>UPCOMING</strong></h3>
+            </div>
+            <div class="more-reviews">
+                <ul id="flexiselDemo2">
+                    @{
+                        var upcoming = Model.Where(m => m.STATUS.Equals("Upcoming"));
+                        foreach (var m in upcoming)
+                        {
+                            string modelName = "modal" + m.MOVIE_ID;
+                            <li>
+                                <div class="thumbnail">
+                                    <a href="#">
+                                        <img src="@m.POSTER_IMAGE" alt="@m.NAME" />
+                                        <div class="caption">
+                                            <h3><b>@m.NAME</b></h3>
+                                            <a class="book" data-toggle="modal" data-target="#@modelName" style="width: 100%">Details &nbsp;&nbsp;<i class="fa fa-caret-square-o-right"></i></a>
+                                        </div>
+                                    </a>
+                                </div>
+                            </li>
+                        }
+
+                    }
+                </ul>
+            </div>
+            
+            @{
+                foreach (var movie in upcoming)
+                {
+                    string modalName = "modal" + movie.MOVIE_ID;
+                    <!-- Modal -->
+                    <div class="modal fade" id="@modalName" role="dialog">
+                        <div class="modal-dialog">
+                            <!-- Modal content-->
+                            <div class="modal-content" style="min-width: 900px;margin-left:-50px">
+                                <div class="modal-header" style="background: #dfb636">
+                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                    <h3 class="modal-title" style="text-align: center; color:white"><strong>@movie.NAME</strong></h3>
+                                </div>
+                                <div class="modal-body" style="background: #2d2d2d ; margin-bottom: -15px">
+                                    <div class="container-fluid" style="background: #2d2d2d;">
+                                        <div class="row">
+                                            <img src="@movie.POSTER_IMAGE" alt="@movie.NAME" class="col-md-4" style="height:400px;width:300px;" />
+                                            <div class="row col-md-8" style="font-size: 16px;color: white">
+                                                <p><b>Director</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp;&nbsp; @movie.DIRECTOR</p>
+                                                <p><b>Actors</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp;&nbsp; @movie.ACTORS</p>
+                                                <p><b>Rating</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp;&nbsp; @movie.RATING/10</p>
+                                                <p><b>Genre</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp; @movie.GENRE</p>
+                                                <p><b>Release</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp;&nbsp; @movie.RELEASE_DATE.ToString("MMMM dd, yyyy") </p>
+                                                <p><b>Synopsis </b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp;&nbsp; @movie.DESCRIPTION</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer" style="background:#dfb636">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                                                    }
+            }
+    @Scripts.Render("~/Scripts/index.js")
+    @Scripts.Render("~/Scripts/jquery.flexisel.js")
+    @Scripts.Render("~/Scripts/jquery.slidey.js")
+    <script type="text/javascript">
+                $("#slidey").slidey({
+                    interval: 8000,
+                    listCount: 5,
+                    autoplay: false,
+                    showList: true
+                });
+    </script>
+    
+    
+</body>

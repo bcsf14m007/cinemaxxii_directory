@@ -1,0 +1,338 @@
+﻿@model List<CinemaXXII.Models.BOOKING>
+@{
+    Layout = "~/Views/Shared/userlayout.cshtml";
+}
+                <script>
+                        function getDates() {
+                            document.getElementById("date").innerHTML = "<option value=''>None</option>";
+                            document.getElementById("timing").innerHTML = "<option value=''>None</option>";
+                            var value = '@Request.RequestContext.HttpContext.Session["UserId"]';
+                            if (value == '')
+                                alert('Please Login/Signup first');
+                            else {
+                                var movieId = document.getElementById("movie").value;
+                                if (movieId == '')
+                                    alert('Select a movie first');
+                                else
+                                {
+                                    $.getJSON("/User/Getdates?movieId="+movieId, function (data) {
+                                        if (data == '')
+                                            alert('Sorry No Shows Avaiable');
+                                        else
+                                        {
+                                            var output = $("#date");
+                                            for (var i = 0; i < data.length ; i++) {
+                                                var timing = data[i];
+                                                output.append("<option value='" + timing.showid + "'>" + timing.date + "</option>");
+                                            }
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                        function getTimes() {
+                            document.getElementById("timing").innerHTML = "<option value=''>None</option>";
+                                var showId = document.getElementById("date").value;
+                                if (showId == '')
+                                    alert('Select a Date first');
+                                else {
+                                    $.getJSON("/User/Gettiming?showId=" + showId, function (data) {
+                                        if (data == '')
+                                            alert('No Shows Available');
+                                        else {
+                                            var output = $("#timing");
+                                            for (var i = 0; i < data.length ; i++) {
+                                                var timing = data[i];
+                                                output.append("<option value='" + timing.showid + "'>" + timing.showtime + "</option>");
+                                            }
+                                        }
+                                    });
+                                }
+                        }
+                        function checkTicketsAvaialability()
+                        {
+                            $.ajaxSetup({
+                                async: false
+                            });
+
+                            var showId = document.getElementById("timing").value;
+                            var retVal = false;
+                            
+                            $.getJSON("/User/CheckTickets?showId=" + showId, function (data) {
+                                if (data == '')
+                                    alert('No Date Available');
+                                else {
+                                    retVal = data;
+                                }
+                            });
+                           
+                             $.ajaxSetup({
+                                async: true
+                             });
+                             if (retVal == false)
+                                 alert('Sorry no Tickets available for selected show');
+                            return retVal;
+                        }
+                </script>
+
+                <div id="col-1">
+                <div class="modal-header" style="background: #dfb636;margin-bottom: 20px;">
+                    <h3 class="modal-title" style="text-align: center; color:white"><strong> RESERVATION</strong></h3>
+                </div>
+
+                    <!--Booking -->
+                <form class="form-horizontal" style="max-width: 800px;margin: auto" action="/User/BookMovie" method="post" onsubmit="return checkTicketsAvaialability()">
+                    <fieldset>
+
+                    <!-- Form Name 
+                    <legend>Reservation</legend>-->
+
+                    <!-- Select Basic -->
+                    <div class="form-group" style="margin-top:15px;margin-bottom: 25px;">
+                    <label class="col-md-4 control-label" for="movie">Movie *</label>
+                    <div class="col-md-5">
+                        <select id="movie" name="movie" class="form-control" required onchange="getDates()">
+                            <option value="">None</option>
+                            @{
+                                CinemaXXII.Models.CinemaXXIIDbEntities db = new CinemaXXII.Models.CinemaXXIIDbEntities();
+
+                                var nowShowing = from movie in db.MOVIEs where movie.STATUS.Equals("Now Showing") select movie;
+
+                                foreach (var movie in nowShowing)
+                                {
+                                    <option value="@movie.MOVIE_ID">@movie.NAME</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top:15px;margin-bottom: 25px;">
+                    <label class="col-md-4 control-label" for="date">Date *</label>
+                    <div class="col-md-5">
+                        <select id="date" name="date" class="form-control" required onchange="getTimes()">
+                            <option value="">None</option>
+                        </select>
+                    </div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 25px;">
+                    <label class="col-md-4 control-label" for="timing">Timing *</label>
+                    <div class="col-md-5">
+                        <select id="timing" name="timing" class="form-control" required>
+                            <option value="">None</option>
+                        </select>
+                    </div>
+                    </div>
+
+                    <!-- Button -->
+                    <div class="form-group" style="margin-bottom: 38px;">
+                    <label class="col-md-4 control-label" for="submit"></label>
+                    <div class="col-md-5">
+                        <input type="submit" id="submit" name="submit" class="btn btn-primary" value="Select Seats" style="float:right"/>
+                    </div>
+                    </div>
+
+
+                    </fieldset>
+                </form>
+                    <!--Booking -->
+                </div>
+
+
+                <div id="col-2">
+                <div class="modal-header" style="background: #dfb636;margin-bottom: 20px;">
+                    <h3 class="modal-title" style="text-align: center; color:white"><strong> VIEW RESERVATION</strong></h3>
+                </div>
+
+                    <!--View Booking Id-->
+                <form class="form-horizontal" action="/User/GetBookingById" method="post">
+                    <fieldset>
+
+                    <!-- Text input-->
+                    <div class="form-group">
+                    <label class="col-md-4 control-label" for="bookingId">Booking ID</label>  
+                    <div class="col-md-5">
+                        <input id="bookingId" name="bookingId" type="text" placeholder="Booking ID" class="form-control input-md" required="">
+                    </div>
+                    </div>
+
+                     <!-- Button -->
+                    <div class="form-group"">
+                    <label class="col-md-4 control-label" for="submit"></label>
+                    <div class="col-md-5">
+                        <input type="submit" id="submit" name="submit" class="btn btn-primary" value="Search" style="float:right"/>
+                    </div>
+                    </div>
+
+                    </fieldset>
+                </form>
+                    <!--View Booking Id-->
+                
+                <h4 style="margin-left: 50%;margin-bottom:15px">OR</h4>
+
+                <!--View All Email-->
+                <form class="form-horizontal" action="/User/BookingbyEmail" method="post">
+                    <fieldset>
+
+                    <!-- Text input-->
+                    <div class="form-group">
+                    <label class="col-md-4 control-label" for="email">Email</label>  
+                    <div class="col-md-5">
+                    <input id="bookingId" name="email" type="text" placeholder="Email" class="form-control input-md" required="">
+                        
+                    </div>
+                    </div>
+
+                     <!-- Button -->
+                    <div class="form-group">
+                    <label class="col-md-4 control-label" for="submit"></label>
+                    <div class="col-md-5">
+                        <input type="submit" id="submit" name="submit" class="btn btn-primary" value="Search" style="float:right"/>
+                    </div>
+                    </div>
+
+                    </fieldset>
+                </form>
+                <!--View All Email-->
+                <h4 style="margin-left: 50%;margin-bottom:15px" id="orAllReservations">OR</h4>
+                
+                <!--View All-->
+                <form class="form-horizontal" action="/User/GetAllBooking" method="post">
+                    <fieldset>
+
+                     <!-- Button -->
+                    <div class="form-group" >
+                    <label class="col-md-4 control-label" for="submit"></label>
+                    <div class="col-md-5">
+                        <input type="submit" id="submitAllReservations" name="submit" class="btn btn-primary" value="View All Reservations" style="float:right"/>
+                        @{ 
+                            if (Session["UserId"] == null)
+                            {
+                                <script>
+                                    document.getElementById('submitAllReservations').style.visibility = 'hidden';
+                                    document.getElementById('orAllReservations').style.visibility = 'hidden';
+                                </script>
+                            }
+                        }
+                    </div>
+                    </div>
+
+                    </fieldset>
+                </form>
+                <!--View All-->
+            
+
+                
+                </div>
+                <hr style="border-bottom: 2px solid black; margin-top:5px; margin-bottom: 15px;" />
+                <div class="modal-footer" style="background:#dfb636;margin-top:390px;">
+                </div>
+
+                <!-- Modal -->
+                @{
+                    if (ViewBag.ShowBooking != null)
+                    {
+                        CinemaXXII.Models.SHOWING currentShow = null;
+                        CinemaXXII.Models.MOVIE currentMovie = null;
+                        
+
+                        <div class="modal fade" id="bookingModal" role="dialog">
+                            <div class="modal-dialog">
+                                <!-- Modal content-->
+                                <div class="modal-content" style="min-width: 800px">
+                                    <div class="modal-header" style="background: #dfb636">
+                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                        <h3 class="modal-title" style="text-align: center; color:white"><strong> BOOKING DETAILS</strong></h3>
+                                    </div>
+                                    <div class="modal-body" style="margin-bottom: -15px">
+                                        <div class="container-fluid" >
+                                            @{ 
+                                                if(Model.Count==0)
+                                                {
+                                                    <h1 style="text-align:center">Sorry No Bookings Available</h1>
+                                                }
+                                                else
+                                                {
+                                                    <div class="table-responsive">
+                                                        <table class="table">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>#</th>
+                                                                    <th>Movie</th>
+                                                                    <th>Booking Date</th>
+                                                                    <th>Seats</th>
+                                                                    <th>Show Date</th>
+                                                                    <th>Showtime</th>
+                                                                    <th>Total Amount</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @{
+                                                                    for (int i = 0; i < Model.Count; i++)
+                                                                    {
+                                                                        try
+                                                                        {
+                                                                            currentShow = db.SHOWINGs.Find(Model.ElementAt(i).SHOW_ID);
+                                                                            currentMovie = db.MOVIEs.Find(currentShow.MOVIE_ID);
+                                                                            <tr>
+                                                                                <td > @(i+1) </td >
+                                                                                <td > @currentMovie.NAME </td >
+                                                                                <td > @Model.ElementAt(i).BOOKING_DATE.ToString("MMMM dd, yyyy hh:mm:ss") </td >
+                                                                                <td >
+                                                                                    @{
+                                                                                        int counter = 1;
+                                                                                        char seat = 'A';
+                                                                                        string space = "  ";
+                                                                                        for (int j = 0; j < Model.ElementAt(i).SEATS.Length; j++)
+                                                                                        {
+                                                                                            if (Model.ElementAt(i).SEATS[j] == 'y')
+                                                                                            {
+                                                                                                @counter @seat @space
+                                                                                            }
+                                                                                            counter++;
+                                                                                            if (counter == 11)
+                                                                                            {
+                                                                                                counter = 1;
+                                                                                                seat++;
+                                                                                            }
+                                                                                        }
+                                                                                    } 
+                                                                                </td >
+                                                                                <td > @currentShow.DATE.ToString("MMMM dd, yyyy ddd")</td>
+                                                                                <td>@currentShow.SHOWTIME</td>
+                                                                                <td>@Model.ElementAt(i).TOTAL_AMOUNT</td>
+                                                                            </tr>
+                                                                        }
+                                                                        catch (Exception e)
+                                                                        {
+
+                                                                        }
+                                                                    }
+                                                                }
+                                                                
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                                    }
+                                            }
+                                            
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer" style="background:#dfb636">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                     
+                    }
+                    <script>
+                        $('#bookingModal').modal('show');
+                    </script> 
+                    ViewBag.ShowBooking = null;
+                }
+                
+    
+<script src="~/Scripts/login.js"></script>

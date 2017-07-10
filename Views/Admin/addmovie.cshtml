@@ -1,0 +1,119 @@
+﻿@{
+    Layout = "~/Views/Shared/adminlayout.cshtml";
+}
+@Styles.Render("~/Content/forms.css")
+
+@{
+    if (ViewBag.SubmitMovie != null)
+    {
+        <div class="modal fade" id="confirmDialog" role="dialog">
+            <div class="modal-dialog">
+                <!-- Modal content-->
+                <div class="modal-content" style="min-width: 800px;margin-left:-50px">
+                    <div class="modal-header" style="background: #dfb636">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h3 class="modal-title" style="text-align: center; color:white"><strong>Success Dialog</strong></h3>
+                    </div>
+                    <div class="modal-body" style="background: #2d2d2d ; margin-bottom: -15px">
+                        <div class="container-fluid" style="background: #2d2d2d;color:white">
+                            <h3>@ViewBag.SubmitMovie</h3>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="background:#dfb636">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            $('#confirmDialog').modal('show');
+        </script>
+        ViewBag.SubmitMovie = null;
+    }
+}
+<form enctype="multipart/form-data" class="formoid-default-orange" style="background-color:#FFFFFF;font-size:17px;font-family:'Open Sans','Helvetica Neue','Helvetica',Arial,Verdana,sans-serif;color:#666666;max-width:600px;min-width:150px;background:#F5F5DC" method="post" action="/Admin/AddMovie">
+    <div class="title">
+        <h2 style="text-align:center;margin-top:20px"><b>Movie Details</b></h2>
+    </div>
+    <div class="element-input">
+        <label class="title">Name<span class="required">*</span></label>
+        <input class="large" type="text" name="name" maxlength="70" required="required"/>
+    </div>
+    <div class="element-input">
+        <label class="title">Director<span class="required">*</span></label>
+        <input class="large" type="text" name="director" maxlength="50" required="required" />
+    </div>
+    <div class="element-input">
+        <label class="title">Actors<span class="required">*</span></label>
+        <input class="large" type="text" name="actors" maxlength="100" required="required" />
+    </div>
+    <div class="element-input">
+        <label class="title">Genre<span class="required">*</span></label>
+        <input class="large" type="text" name="genre" maxlength="50" required="required" />
+    </div>
+    <div class="element-date">
+        <label class="title">Release Date<span class="required">*</span></label>
+        <input class="large" data-format="dd-mm-yyyy"  type="date" min="@DateTime.Now.ToString("yyyy-MM-dd")" name="releasedate" required="required" placeholder="dd-mm-yyyy" />
+    </div>
+    <div class="element-number">
+        <label class="title">Rating<span class="required">*</span></label>
+        <input class="large" type="text" min="0" max="10" maxlength="3" name="rating" required="required" onkeypress='return event.charCode >= 48 && event.charCode <= 57 || event.charCode == 46' value="" />
+    </div>
+    <div class="element-input">
+        <label class="title">Trailer<span class="required">*</span></label>
+        <input class="large" type="text" name="trailer" maxlength="50" required="required" />
+    </div>
+    <div class="element-select" title=" ">
+        <label class="title">Status<span class="required">*</span></label>
+        <div class="large">
+            <span>
+                <select name="status" required="required">
+                    <option value="Now Showing">Now Showing</option>
+                    <option value="Upcoming">Upcoming</option>
+                    <option value="Not Showing">Not Showing</option>
+                </select><i></i>
+            </span>
+        </div>
+    </div>
+    <div class="element-number">
+        <label class="title">Ticket Price<span class="required">*</span></label>
+        <input class="large" type="text" min="0" max="1500" maxlength="4" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="ticketprice" required="required" value="" />
+    </div>
+    <div class="element-textarea">
+        <label class="title">Description<span class="required">*</span></label>
+        <textarea class="medium" name="description" cols="20" rows="5" maxlength="300" required="required"></textarea>
+    </div>
+    <div class="element-file">
+        <label class="title">Poster<span class="required">*</span></label>
+        <label class="large">
+            <div class="button">Upload Image</div>
+                <input type="file" class="file_input" name="posterimage" required="required" />
+            <div class="file_text">No image selected</div>
+        </label>
+    </div>
+    <div class="element-file">
+        <label class="title">Cover<span class="required">*</span></label>
+        <label class="large">
+            <div class="button">Upload Image</div>
+            <input type="file" class="file_input" name="coverimage" required="required" />
+            <div class="file_text">No image selected</div>
+        </label>
+    </div>
+    <div class="element-file">
+        <label class="title">Trailer Image<span class="required">*</span></label>
+        <label class="large">
+            <div class="button">Upload Image</div>
+            <input type="file" class="file_input" name="trailerimage" required="required" />
+            <div class="file_text">No image selected</div>
+        </label>
+    </div>
+    <div class="submit"><input type="submit" value="Submit"/></div>
+</form>
+
+
+
+<script>
+    jQuery("input[type=file]").change(function () {
+        $(this).next().html($(this).val());
+    });
+</script>

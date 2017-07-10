@@ -1,0 +1,62 @@
+﻿@model List<CinemaXXII.Models.MOVIE>
+@{
+    Layout = "~/Views/Shared/userlayout.cshtml";
+}
+<div class="right-content">
+    <div class="right-content-heading">
+        <div class="right-content-heading-left">
+            <h3 class="head">Latest Colletcion of Trailers</h3>
+        </div>
+    </div>
+    <!-- pop-up-box -->
+
+    <link href="~/Content/popuo-box.css" rel="stylesheet" type="text/css" media="all" />
+    <script>
+        function stopVideo(myframe)
+        {
+            var url = $(myframe).attr('src');
+            $(myframe).attr('src', '');
+            $(myframe).attr('src', url);
+        }
+    </script>
+    <!--//pop-up-box -->
+
+    <div class="content-grids">
+        @{
+            var movies = from m in Model where m.STATUS.Equals("Now Showing") || m.STATUS.Equals("Upcoming") select m;
+            foreach (var movie in movies)
+            {
+                string modalId = "modal" + movie.MOVIE_ID;
+                <div class="content-grid">
+                    <a class="play-icon popup-with-zoom-anim" data-toggle="modal" data-target="#@modalId"><img src="@movie.TRAILER_IMAGE" title="allbum-name" /></a>
+                    <h3>@movie.NAME</h3>
+                    <a class="button play-icon popup-with-zoom-anim" data-toggle="modal" data-target="#@modalId">Watch now</a>
+                </div>
+            }
+            foreach (var movie in movies)
+            {
+                string modalId = "modal" + movie.MOVIE_ID;
+                string iframeId = "iframe" + movie.MOVIE_ID;
+                <div class="modal fade" id="@modalId" role="dialog">
+                    <div class="modal-dialog">
+                        <!-- Modal content-->
+                        <div class="modal-content" style="margin-left:-100px; width:854px; height:480px;background:#dfb636">
+                            <div class="modal-header">
+                                <h3 class="modal-title" style="text-align: center; color:white"><strong>@movie.NAME</strong></h3>
+                                <button type="button" class="close" data-dismiss="modal" style="color:white;font-size:40px;margin-top:-40px" onclick="stopVideo(@iframeId)">&times;</button>
+                            </div>
+                            <div class="modal-body" style="background-color: transparent;">
+                                 <iframe id="@iframeId" width="854" height="480" style="margin-left:-21px;margin-top:-21px;" src="@movie.TRAILER" frameborder="0" allowfullscreen></iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                }
+            }
+        <div class="clearfix"> </div>
+    </div>
+    <div class="clearfix"> </div>
+</div>
+
+
+<script src="~/Scripts/login.js"></script>
